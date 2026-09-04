@@ -10,7 +10,7 @@ compiles the firmware on each push.
 | ----------- | ------------------------------------------------------------ |
 | Keyboard    | Corne (crkbd), 42 keys, split                                |
 | Controllers | ProMicro / SuperMini nRF52840 (nice!nano v2 compatible)      |
-| Displays    | 0.91in 128x32 OLED (SSD1306) on both halves                  |
+| Displays    | 0.91in 128x32 OLED (SSD1306) on both halves, nice!oled widgets |
 | ZMK build   | `nice_nano_v2` board + `corne_left` / `corne_right` shields  |
 | ZMK version | `v0.3` (pinned in `config/west.yml` and the workflow)        |
 
@@ -21,9 +21,9 @@ half only talks to the left half.
 
 ```
 build.yaml                    which firmware files to build (board + shield matrix)
-config/corne.conf             firmware settings (Bluetooth power, sleep, ...)
+config/corne.conf             firmware settings (Bluetooth power, screens, sleep, ...)
 config/corne.keymap           the key layout, 3 layers
-config/west.yml               which ZMK version to build against
+config/west.yml               which ZMK version and modules to build against
 .github/workflows/build.yml   GitHub Actions build
 boards/shields/               empty; custom shields could go here later
 docs/superpowers/specs/       design notes
@@ -112,10 +112,79 @@ order:
   tuned antenna on some batches. If one half is much worse than the other,
   swap the controllers between halves to confirm, then replace the bad one.
 
-## Changing the keymap
+## Screens
 
-The layout is in `config/corne.keymap`. Each layer has a comment block
-drawing the keys above the `bindings` list; keep them in sync.
+The OLEDs run the [nice!oled](https://github.com/mctechnology17/zmk-nice-oled)
+module, pulled in through `config/west.yml` and the `nice_oled` shield in
+`build.yaml`. Left half: Bluetooth profile, battery, words per minute with a
+speedometer and Luna the dog, active modifiers, layer name. Right half:
+battery and a cat animation.
+
+To change the animations, edit the `Display` block in `config/corne.conf`;
+the alternatives are listed there as commented lines. The module is pinned
+to one commit in `config/west.yml`; bump that revision to update it.
+
+## Remapping keys live with ZMK Studio
+
+The left half is built with ZMK Studio, so you can change keys from a
+browser without rebuilding:
+
+1. Plug the **left** half into the computer over USB.
+2. Open <https://zmk.studio> in Chrome or Edge, click Connect, and pick the
+   Corne serial device.
+3. Hold the Lower thumb key and press the key under `Z` (`UNLK` on the
+   Lower layer). The keyboard stays unlocked while you use Studio.
+4. Click a key in Studio, choose a new binding, and it applies immediately.
+
+Studio edits are stored on the keyboard, not in this repo. The keymap in
+`config/corne.keymap` is the baseline: Studio's restore-stock-settings
+option returns to it, and so does flashing `settings_reset.uf2`. Once you
+like a layout, copy it into the keymap file so it survives resets and
+rebuilds.
+
+On Linux your user needs access to the USB serial port:
+
+```sh
+sudo usermod -aG dialout $USER
+```
+
+then log out and back in.
+
+## Changing the keymap in the repo
+
+The layout lives in `config/corne.keymap`. Each layer is a `bindings` list
+of 42 entries in the order of the physical keys: three rows of 12 (6 left,
+6 right), then the 6 thumb keys (3 left, 3 right). The comment block above
+each list draws the layer; keep it in sync when you edit.
+
+Bindings you will use most:
+
+| Binding          | Meaning                                                   |
+| ---------------- | --------------------------------------------------------- |
+| `&kp KEY`        | press a key: `&kp ESC`, `&kp LCTRL`, `&kp N1`, `&kp F5`    |
+| `&mo N`          | hold to activate layer N                                  |
+| `&trans`         | transparent: use whatever the layer below has              |
+| `&none`          | do nothing                                                |
+| `&mt MOD KEY`    | hold for modifier, tap for key: `&mt LCTRL ESC`            |
+| `&lt N KEY`      | hold for layer N, tap for key: `&lt 1 SPACE`               |
+| `&bt BT_SEL 0`   | switch to Bluetooth profile 1 (profiles are 0 to 4)        |
+| `&studio_unlock` | unlock the keyboard for ZMK Studio                        |
+
+Worked example: make the key under `Tab` (currently `LCTRL`) send Escape
+when tapped and act as Control when held. In the default layer change
+
+```
+&kp LCTRL &kp A &kp S ...
+```
+
+to
+
+```
+&mt LCTRL ESC &kp A &kp S ...
+```
+
+Then commit, push, download the firmware, and flash both halves (the right
+half needs the new keymap too, or its keys keep the old meaning).
 
 - Key codes: <https://zmk.dev/docs/keymaps/list-of-keycodes>
 - Behaviors (layers, mod-tap, combos, ...): <https://zmk.dev/docs/keymaps/behaviors>
@@ -124,13 +193,13 @@ drawing the keys above the `bindings` list; keep them in sync.
 
 Layers as shipped:
 
-| Layer   | Reached by          | Contents                                  |
-| ------- | ------------------- | ----------------------------------------- |
-| Default | always              | QWERTY, Tab/Ctrl/Shift, GUI/Space, Enter/Alt |
-| Lower   | hold left thumb key | numbers, Bluetooth profile select, arrows |
-| Raise   | hold right thumb key| symbols and brackets                      |
+| Layer   | Reached by           | Contents                                          |
+| ------- | -------------------- | ------------------------------------------------- |
+| Default | always               | QWERTY, Tab/Ctrl/Shift, GUI/Space, Enter/Alt      |
+| Lower   | hold left thumb key  | numbers, Bluetooth profiles, arrows, Studio unlock |
+| Raise   | hold right thumb key | symbols and brackets                              |
 
-Bluetooth profiles on the Lower layer: `BT1`…`BT5` switch between up to
+Bluetooth profiles on the Lower layer: `BT1` to `BT5` switch between up to
 five paired computers, `BTCLR` forgets the current profile's pairing.
 
 ## Upgrading ZMK later

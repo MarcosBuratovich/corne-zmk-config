@@ -97,3 +97,19 @@ selected the Sharp LCD as the display and disabled the I2C bus the OLED
 sits on. Fix: plain `corne_left` / `corne_right` shields plus
 `CONFIG_ZMK_DISPLAY=y`. Verified in the compiled firmware: chosen display
 is the OLED node and `CONFIG_SSD1306=y`.
+
+## Amendment, 2026-09-04: screens and live remapping
+
+Approved after the OLED fix worked.
+
+- Screens: the nice!oled module (`mctechnology17/zmk-nice-oled`, pinned to
+  commit `46f824a`, tested by its author against ZMK v0.3.0) via the
+  `nice_oled` shield on both halves and
+  `CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM=y`. Module defaults kept: Luna
+  and the speedometer on the left, the cat on the right. Modifier icons in
+  Windows/Linux style. Alternatives left as commented lines in the conf.
+- ZMK Studio on the left (central) half only: `studio-rpc-usb-uart`
+  snippet plus `CONFIG_ZMK_STUDIO=y` in `build.yaml`, and a
+  `&studio_unlock` binding on the Lower layer under `Z`. Studio edits live
+  on the keyboard; the repo keymap remains the baseline.
+- README: screens, Studio, and a keymap-editing guide with a worked example.

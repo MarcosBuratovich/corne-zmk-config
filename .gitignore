@@ -1,4 +1,4 @@
 build/
 .west/
 .DS_Store
-firmware/
+firmware*/

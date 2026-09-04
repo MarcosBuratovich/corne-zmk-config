@@ -2,22 +2,27 @@
 #
 # Hardware: Corne (crkbd) with ProMicro/SuperMini nRF52840 controllers
 # (nice!nano v2 compatible) and 128x32 SSD1306 OLED displays on both halves.
-# The OLED is switched on with CONFIG_ZMK_DISPLAY=y in config/corne.conf; the
-# Corne shield already describes it, so no display shield is needed here.
 #
-# Each entry produces one .uf2 file. The artifact name is what you will see
-# inside the firmware zip downloaded from the Actions run.
+# `nice_oled` is the nice!oled module's shield (see config/west.yml). It turns
+# the OLED on and draws the vertical widgets. Keep it after the corne shield.
 #
-# `settings_reset` is a tiny firmware that wipes stored Bluetooth bonds. Flash
-# it to BOTH halves (then re-flash the real firmware) whenever the halves stop
-# pairing with each other. See README.md.
+# The left half is the central: it also gets ZMK Studio (live key remapping
+# over USB from https://zmk.studio). The snippet opens the USB serial channel
+# Studio talks over; the cmake arg enables Studio itself. Only the central
+# half needs this.
+#
+# `settings_reset` is a tiny firmware that wipes stored Bluetooth bonds and
+# any ZMK Studio edits. Flash it to BOTH halves (then re-flash the real
+# firmware) whenever the halves stop pairing with each other. See README.md.
 ---
 include:
   - board: nice_nano_v2
-    shield: corne_left
+    shield: corne_left nice_oled
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_ZMK_STUDIO=y
     artifact-name: corne_left
   - board: nice_nano_v2
-    shield: corne_right
+    shield: corne_right nice_oled
     artifact-name: corne_right
   - board: nice_nano_v2
     shield: settings_reset
