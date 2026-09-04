@@ -1,0 +1,12 @@
+# ZMK keyboards (USB vendor 1d50, product 615e): let the logged-in desktop user
+# open the ZMK Studio serial port, and keep ModemManager from probing it.
+#
+# Install (Ubuntu/Debian):
+#   sudo install -m 644 udev/60-zmk-studio.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules
+#   then unplug and replug the keyboard.
+#
+# The file name must sort before 73-seat-late.rules (applies the uaccess ACL)
+# and before ModemManager's 77-mm-*.rules.
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="615e", TAG+="uaccess", GROUP="plugdev", MODE="0660", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="usb", ATTR{idVendor}=="1d50", ATTR{idProduct}=="615e", ENV{ID_MM_DEVICE_IGNORE}="1"

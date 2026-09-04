@@ -25,6 +25,7 @@ config/corne.conf             firmware settings (Bluetooth power, screens, sleep
 config/corne.keymap           the key layout, 3 layers
 config/west.yml               which ZMK version and modules to build against
 .github/workflows/build.yml   GitHub Actions build
+udev/                         Linux udev rule for the ZMK Studio serial port
 boards/shields/               empty; custom shields could go here later
 docs/superpowers/specs/       design notes
 ```
@@ -142,13 +143,18 @@ option returns to it, and so does flashing `settings_reset.uf2`. Once you
 like a layout, copy it into the keymap file so it survives resets and
 rebuilds.
 
-On Linux your user needs access to the USB serial port:
+On Linux the serial port is root-only by default and Studio reports
+"Failed to open the serial port". Install the udev rule from this repo once:
 
 ```sh
-sudo usermod -aG dialout $USER
+sudo install -m 644 udev/60-zmk-studio.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
 ```
 
-then log out and back in.
+then unplug and replug the keyboard. The rule gives the logged-in user
+access to ZMK keyboards' serial port and stops ModemManager from probing
+it. Alternative without the rule: add yourself to the `dialout` group with
+`sudo usermod -aG dialout $USER` and log out and back in.
 
 ## Changing the keymap in the repo
 
