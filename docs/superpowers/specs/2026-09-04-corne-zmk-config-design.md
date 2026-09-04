@@ -21,7 +21,7 @@ to keep the keyboard's firmware settings and keymap.
 - Corne (crkbd) split keyboard.
 - ProMicro / SuperMini nRF52840 controllers: nice!nano v2 compatible,
   ZMK board id `nice_nano_v2` on ZMK v0.3.
-- nice!view e-paper displays on both halves.
+- 0.91in 128x32 SSD1306 OLED displays on both halves, on the 4-pin OLED header.
 - Keymap starts from ZMK's default Corne keymap.
 
 ## Decision: build with GitHub Actions
@@ -45,10 +45,9 @@ Based on `zmkfirmware/unified-zmk-config-template`, pinned to ZMK `v0.3`.
 
 ```
 build.yaml                    matrix: nice_nano_v2 x {corne_left, corne_right}
-                              each with nice_view_adapter + nice_view,
                               plus a settings_reset build
 config/west.yml               ZMK v0.3
-config/corne.conf             connection fix + commented optional settings
+config/corne.conf             connection fix, OLED enable, commented options
 config/corne.keymap           ZMK default Corne keymap, verbatim
 .github/workflows/build.yml   reusable ZMK workflow @v0.3
 zephyr/module.yml, boards/    template scaffolding for future custom shields
@@ -67,10 +66,9 @@ Left commented, with explanation, for later:
 - `CONFIG_ZMK_BLE_EXPERIMENTAL_CONN=y` for a flaky link to the computer.
 - `CONFIG_ZMK_SLEEP=y` plus idle timeout for battery life.
 
-`CONFIG_ZMK_DISPLAY` is not set in `corne.conf` on purpose: the nice!view
-shield enables the display itself, and setting it globally would break a
-build that dropped the nice!view shields (the Corne shield would then try
-to enable an OLED driver with no display node).
+`CONFIG_ZMK_DISPLAY=y` in `corne.conf` turns on the OLED. The Corne shield
+declares the SSD1306 node and enables I2C when the display is on, so no
+extra display shield is needed.
 
 ## Verification
 
@@ -88,3 +86,14 @@ to enable an OLED driver with no display node).
   tuned clone antenna). The README lists the checks.
 - ZMK after v0.3 renames the board id to `nice_nano//zmk`; upgrading
   requires updating `build.yaml`, `west.yml`, and the workflow together.
+
+## Amendment, 2026-09-04: display type corrected
+
+The first build targeted a nice!view (Sharp memory LCD over SPI) based on
+an early answer about the hardware. After flashing, both screens stayed
+blank while the split link worked. The displays light up and use a 4-pin
+header, which identifies them as SSD1306 OLEDs. The nice!view shields
+selected the Sharp LCD as the display and disabled the I2C bus the OLED
+sits on. Fix: plain `corne_left` / `corne_right` shields plus
+`CONFIG_ZMK_DISPLAY=y`. Verified in the compiled firmware: chosen display
+is the OLED node and `CONFIG_SSD1306=y`.

@@ -10,7 +10,7 @@ compiles the firmware on each push.
 | ----------- | ------------------------------------------------------------ |
 | Keyboard    | Corne (crkbd), 42 keys, split                                |
 | Controllers | ProMicro / SuperMini nRF52840 (nice!nano v2 compatible)      |
-| Displays    | nice!view e-paper on both halves                             |
+| Displays    | 0.91in 128x32 OLED (SSD1306) on both halves                  |
 | ZMK build   | `nice_nano_v2` board + `corne_left` / `corne_right` shields  |
 | ZMK version | `v0.3` (pinned in `config/west.yml` and the workflow)        |
 
@@ -100,7 +100,7 @@ order:
 - **Battery placement.** On many builds the battery sits directly on top of
   the controller's antenna (the zig-zag trace at the USB end of the board).
   Move it off the antenna or under the PCB.
-- **nice!view placement.** The display sits over the controller. Make sure
+- **OLED placement.** The display sits over the controller. Make sure
   its PCB and pins are not covering the antenna trace.
 - **Metal.** A metal case, metal plate, or a metal desk right under the
   antenna kills range.

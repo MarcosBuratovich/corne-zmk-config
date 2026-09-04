@@ -1,7 +1,9 @@
 # Build matrix for GitHub Actions.
 #
 # Hardware: Corne (crkbd) with ProMicro/SuperMini nRF52840 controllers
-# (nice!nano v2 compatible) and nice!view e-paper displays on both halves.
+# (nice!nano v2 compatible) and 128x32 SSD1306 OLED displays on both halves.
+# The OLED is switched on with CONFIG_ZMK_DISPLAY=y in config/corne.conf; the
+# Corne shield already describes it, so no display shield is needed here.
 #
 # Each entry produces one .uf2 file. The artifact name is what you will see
 # inside the firmware zip downloaded from the Actions run.
@@ -12,10 +14,10 @@
 ---
 include:
   - board: nice_nano_v2
-    shield: corne_left nice_view_adapter nice_view
+    shield: corne_left
     artifact-name: corne_left
   - board: nice_nano_v2
-    shield: corne_right nice_view_adapter nice_view
+    shield: corne_right
     artifact-name: corne_right
   - board: nice_nano_v2
     shield: settings_reset
