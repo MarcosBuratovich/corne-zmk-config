@@ -41,10 +41,12 @@ docs/superpowers/specs/       design notes
    ```sh
    gh run download -n firmware -D firmware/
    ```
+   The `firmware/` folder is git-ignored, so downloaded binaries never get
+   committed.
    You get three files:
-   - `corne_left-nice_nano_v2-zmk.uf2`
-   - `corne_right-nice_nano_v2-zmk.uf2`
-   - `settings_reset-nice_nano_v2-zmk.uf2`
+   - `corne_left.uf2`
+   - `corne_right.uf2`
+   - `settings_reset.uf2`
 4. Flash each half (see below).
 
 ### Flashing a half
@@ -56,17 +58,17 @@ docs/superpowers/specs/       design notes
    when the copy finishes and the half reboots with the new firmware.
 4. Unplug and repeat for the other half with the other file.
 
-Only ever copy `corne_left…` to the left half and `corne_right…` to the
+Only ever copy `corne_left.uf2` to the left half and `corne_right.uf2` to the
 right half.
 
 ### First flash after a config change to Bluetooth, or when the halves stop pairing
 
 Do a full reset so the halves pair with each other from scratch:
 
-1. Flash `settings_reset-…uf2` to the **left** half.
-2. Flash `settings_reset-…uf2` to the **right** half.
-3. Flash `corne_left-…uf2` to the left half.
-4. Flash `corne_right-…uf2` to the right half.
+1. Flash `settings_reset.uf2` to the **left** half.
+2. Flash `settings_reset.uf2` to the **right** half.
+3. Flash `corne_left.uf2` to the left half.
+4. Flash `corne_right.uf2` to the right half.
 5. Power both halves on at roughly the same time. They pair within a few
    seconds.
 6. On the computer, **forget** the old "Corne" Bluetooth device and pair
