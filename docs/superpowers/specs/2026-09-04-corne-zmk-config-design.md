@@ -105,8 +105,9 @@ Approved after the OLED fix worked.
 - Screens: the nice!oled module (`mctechnology17/zmk-nice-oled`, pinned to
   commit `46f824a`, tested by its author against ZMK v0.3.0) via the
   `nice_oled` shield on both halves and
-  `CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM=y`. Module defaults kept: Luna
-  and the speedometer on the left, the cat on the right. Modifier icons in
+  `CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM=y`. Left: speedometer, WPM number and Luna,
+  set explicitly because the module's default at this commit is bongo cat
+  with no speedometer. Right: the cat (module default). Modifier icons in
   Windows/Linux style. Alternatives left as commented lines in the conf.
 - ZMK Studio on the left (central) half only: `studio-rpc-usb-uart`
   snippet plus `CONFIG_ZMK_STUDIO=y` in `build.yaml`, and a
